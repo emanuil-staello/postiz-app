@@ -237,30 +237,6 @@ services:
       start_period: 60s
 
 
-  temporal-postgresql:
-    image: 'postgres:16'
-    restart: always
-
-    environment:
-      POSTGRES_PASSWORD: 'temporal'
-      POSTGRES_USER: 'temporal'
-
-    expose:
-      - '5432'
-
-    volumes:
-      - temporal-postgres-data:/var/lib/postgresql/data
-
-    healthcheck:
-      test:
-        - CMD-SHELL
-        - 'pg_isready -U temporal'
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-
-
   temporal:
     image: 'temporalio/auto-setup:1.28.1'
     restart: always
@@ -294,13 +270,8 @@ services:
 
     healthcheck:
       test:
-        - CMD
-        - temporal
-        - operator
-        - cluster
-        - health
-        - '--address'
-        - 'temporal:7233'
+        - CMD-SHELL
+        - 'temporal operator cluster health --address $$(hostname -i):7233'
       interval: 10s
       timeout: 5s
       retries: 10
